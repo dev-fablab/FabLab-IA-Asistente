@@ -26,7 +26,10 @@ describe('instrucciones del agente', () => {
     const voice = buildInstructions('voice');
     expect(voice.startsWith(web)).toBe(true);
     expect(voice).toContain('13. Estás hablando en voz alta');
-    expect(rules(voice)).toHaveLength(15);
+    expect(voice).toContain('una a tres oraciones');
+    expect(voice).toContain('una sola pregunta');
+    expect(voice).toContain('no retomes lo anterior');
+    expect(rules(voice)).toHaveLength(18);
   });
 
   it('por defecto es el canal web', () => {

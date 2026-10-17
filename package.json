@@ -19,7 +19,8 @@
     "test:integration": "pnpm --filter @fablab/server test:integration",
     "supabase:start": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,postgres-meta,mailpit,supavisor",
     "supabase:stop": "supabase stop",
-    "models:check": "pnpm --filter @fablab/agent models:check"
+    "models:check": "pnpm --filter @fablab/agent models:check",
+    "voice:check": "pnpm --filter @fablab/agent voice:check"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

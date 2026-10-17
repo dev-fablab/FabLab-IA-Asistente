@@ -34,7 +34,7 @@ export function withLogContext<T>(fields: LogFields, fn: () => T): T {
 }
 
 // Variables cuyo valor jamás debe aparecer en un registro, aunque un mensaje de error lo incluya.
-const SECRET_ENV = ['NVIDIA_API_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_JWT_SECRET', 'DATABASE_URL'] as const;
+const SECRET_ENV = ['OPENROUTER_API_KEY', 'NVIDIA_API_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_JWT_SECRET', 'DATABASE_URL'] as const;
 
 /** Oculta claves y tokens en un texto que viene de fuera (mensajes de error, respuestas de proveedores). */
 export function redact(text: string): string {

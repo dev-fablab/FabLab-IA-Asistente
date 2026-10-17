@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./voice": "./src/voice.ts",
     ".": "./src/index.ts",
     "./models": "./src/models.ts",
     "./embeddings": "./src/embeddings.ts",
@@ -13,7 +14,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "models:check": "tsx --env-file-if-exists=../../apps/web/.env.local scripts/check-models.ts"
+    "models:check": "tsx --env-file-if-exists=../../apps/web/.env.local scripts/check-models.ts",
+    "voice:check": "tsx --env-file-if-exists=../../apps/web/.env.local scripts/check-voice.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "4.0.96",

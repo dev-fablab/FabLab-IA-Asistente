@@ -108,3 +108,19 @@ export function getRetrievalEnv() {
 export function getStorageEnv() {
   return parse(storageSchema, 'el almacenamiento de Mastra');
 }
+
+const voiceSchema = z.object({
+  OPENROUTER_API_KEY: z.string().min(1),
+  STT_MODEL: z.string().min(1).default('nvidia/nemotron-3.5-asr-streaming-multilingual-0.6b'),
+  TTS_MODEL: z.string().min(1).default('google/gemini-3.8-flash-lite-tts'),
+  TTS_VOICE: z.string().min(1).default('Kore'),
+  // Gemini TTS en OpenRouter solo admite PCM; se envuelve como WAV antes de enviarlo al navegador.
+  TTS_RESPONSE_FORMAT: z.enum(['pcm', 'mp3']).default('pcm'),
+  TTS_SAMPLE_RATE: z.coerce.number().int().min(8000).max(48000).default(24000),
+  // Actívalo después de comprobar que ambos modelos tienen endpoints ZDR disponibles.
+  VOICE_ZDR: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
+});
+
+export function getVoiceEnv() {
+  return parse(voiceSchema, 'la voz');
+}

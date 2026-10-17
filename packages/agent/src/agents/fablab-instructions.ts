@@ -23,9 +23,12 @@ const CORE_RULES = [
 
 /** Reglas de forma para la voz (Fase 2): no cambian las de fondo, solo cómo se dice. */
 const VOICE_RULES = [
-  'Estás hablando en voz alta: usa frases cortas y sin formato, sin listas, sin enlaces ni símbolos.',
-  'Di las cifras y las fechas como se pronuncian.',
+  'Estás hablando en voz alta en español de Chile: responde de una a tres oraciones cortas y naturales; ofrece ampliar si hace falta.',
+  'Sin listas, títulos, negritas, tablas, enlaces ni símbolos. Enumera con palabras: primero, luego.',
+  'Di las cifras, horarios, fechas y siglas como se pronuncian. No deletrees direcciones web ni correos.',
   'Cuando haya tarjetas de documento o de contacto en pantalla, avisa con algo como «te lo muestro en pantalla».',
+  'Si la transcripción parece dudosa o falta contexto, confirma antes de responder. Fab Lab y fablab significan lo mismo.',
+  'Haz una sola pregunta a la vez. Tras una interrupción, no retomes lo anterior salvo que te lo pidan.',
 ];
 
 const numbered = (rules: string[], start = 1) => rules.map((rule, index) => `${start + index}. ${rule}`).join('\n');
