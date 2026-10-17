@@ -1,0 +1,25 @@
+{
+  "skill": "drizzle-orm",
+  "test_cases": [
+    {
+      "name": "define_postgres_schema",
+      "input": "Create a Drizzle schema for a users table with id serial primary key, name text not null, email unique, and created_at timestamp default now.",
+      "assertions": ["Uses pgTable from drizzle-orm/pg-core", "Includes serial, text, timestamp columns", "Has .primaryKey(), .notNull(), .unique(), .defaultNow()"]
+    },
+    {
+      "name": "basic_select_with_filter",
+      "input": "Write a Drizzle query to select all active users older than 18 ordered by name descending.",
+      "assertions": ["Uses db.select().from(users)", "Uses eq or and with isActive and age", "Includes orderBy(desc(users.name)) or similar"]
+    },
+    {
+      "name": "generate_migration_command",
+      "input": "How do I generate and apply migrations after changing my Drizzle schema?",
+      "assertions": ["Mentions drizzle-kit generate", "Mentions drizzle-kit migrate or push", "References drizzle.config.ts"]
+    },
+    {
+      "name": "relational_query_example",
+      "input": "Show me how to fetch users with their posts using Drizzle Relational Queries.",
+      "assertions": ["Mentions db.query.users.findMany", "Includes with: { posts: true }", "References defineRelations or relations()"]
+    }
+  ]
+}

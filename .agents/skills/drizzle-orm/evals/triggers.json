@@ -1,0 +1,12 @@
+{
+  "skill": "drizzle-orm",
+  "test_cases": [
+    {"input": "How do I define a schema with Drizzle ORM for PostgreSQL?", "should_trigger": true},
+    {"input": "Write a type-safe insert and select query using Drizzle", "should_trigger": true},
+    {"input": "drizzle-kit generate not detecting my table changes", "should_trigger": true},
+    {"input": "Set up Drizzle with Neon serverless and Relational Queries", "should_trigger": true},
+    {"input": "What is the best ORM for TypeScript?", "should_trigger": false},
+    {"input": "Explain Prisma schema syntax", "should_trigger": false},
+    {"input": "How to use TypeORM migrations", "should_trigger": false}
+  ]
+}
