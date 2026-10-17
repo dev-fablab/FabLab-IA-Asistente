@@ -1,0 +1,28 @@
+{
+  "name": "@fablab/agent",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./models": "./src/models.ts",
+    "./embeddings": "./src/embeddings.ts",
+    "./env": "./src/env.ts",
+    "./log": "./src/log.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "models:check": "tsx --env-file-if-exists=../../apps/web/.env.local scripts/check-models.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "4.0.96",
+    "@fablab/db": "workspace:*",
+    "@mastra/ai-sdk": "1.11.1",
+    "@mastra/core": "1.78.0",
+    "@mastra/pg": "1.31.2",
+    "ai": "7.0.143",
+    "drizzle-orm": "0.45.4",
+    "zod": "4.6.7"
+  }
+}
