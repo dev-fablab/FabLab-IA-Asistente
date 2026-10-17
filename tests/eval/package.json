@@ -1,0 +1,15 @@
+{
+  "name": "@fablab/eval",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "eval": "tsx --env-file-if-exists=../../apps/web/.env.local src/run.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@fablab/agent": "workspace:*",
+    "zod": "4.6.7"
+  }
+}

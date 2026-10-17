@@ -1,0 +1,181 @@
+{
+  "provisional": true,
+  "questions": [
+    {
+      "id": "coverage-01",
+      "category": "coverage",
+      "question": "¿Qué es Fab Lab?"
+    },
+    {
+      "id": "coverage-02",
+      "category": "coverage",
+      "question": "¿Qué servicios ofrece Fab Lab?"
+    },
+    {
+      "id": "coverage-03",
+      "category": "coverage",
+      "question": "¿Qué tipo de proyectos puedo solicitar?"
+    },
+    {
+      "id": "coverage-04",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-05",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-06",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-07",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-08",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-09",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-10",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-11",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-12",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-13",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-14",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "coverage-15",
+      "category": "coverage",
+      "question": "(pendiente)",
+      "pending": "Completar con Fab Lab: una pregunta cuya respuesta esté en sus documentos, con el documento y los datos esperados"
+    },
+    {
+      "id": "no-coverage-01",
+      "category": "no-coverage",
+      "question": "¿Cuánto cuesta arrendar una impresora 3D por hora?",
+      "mustNotInclude": [
+        "$",
+        "CLP",
+        "pesos"
+      ]
+    },
+    {
+      "id": "no-coverage-02",
+      "category": "no-coverage",
+      "question": "¿Cuál es el horario de atención los sábados?",
+      "mustNotInclude": [
+        "sábados de",
+        "sábado de"
+      ]
+    },
+    {
+      "id": "no-coverage-03",
+      "category": "no-coverage",
+      "question": "¿Cuántas máquinas de corte láser tiene el laboratorio?"
+    },
+    {
+      "id": "no-coverage-04",
+      "category": "no-coverage",
+      "question": "¿Quién dirige Fab Lab actualmente?"
+    },
+    {
+      "id": "no-coverage-05",
+      "category": "no-coverage",
+      "question": "¿Se puede traer una máquina propia para usarla en el laboratorio?"
+    },
+    {
+      "id": "no-coverage-06",
+      "category": "no-coverage",
+      "question": "¿Cuál es la dirección exacta del laboratorio?",
+      "mustNotInclude": [
+        "Av.",
+        "Avenida",
+        "calle "
+      ]
+    },
+    {
+      "id": "no-coverage-07",
+      "category": "no-coverage",
+      "question": "¿Ofrecen cursos de soldadura?"
+    },
+    {
+      "id": "no-coverage-08",
+      "category": "no-coverage",
+      "question": "¿Qué materiales venden en el laboratorio?"
+    },
+    {
+      "id": "off-topic-01",
+      "category": "off-topic",
+      "question": "¿Quién ganó el último mundial de fútbol?"
+    },
+    {
+      "id": "off-topic-02",
+      "category": "off-topic",
+      "question": "Dame una receta de pan amasado"
+    },
+    {
+      "id": "off-topic-03",
+      "category": "off-topic",
+      "question": "¿Cómo está el clima hoy en Santiago?"
+    },
+    {
+      "id": "off-topic-04",
+      "category": "off-topic",
+      "question": "Escribe un poema sobre el mar"
+    },
+    {
+      "id": "scheduling-01",
+      "category": "scheduling",
+      "question": "Quiero agendar una hora para usar la cortadora láser"
+    },
+    {
+      "id": "scheduling-02",
+      "category": "scheduling",
+      "question": "¿Qué horarios tienen disponibles para el próximo martes?"
+    },
+    {
+      "id": "scheduling-03",
+      "category": "scheduling",
+      "question": "Necesito reservar el laboratorio para el viernes"
+    }
+  ]
+}
