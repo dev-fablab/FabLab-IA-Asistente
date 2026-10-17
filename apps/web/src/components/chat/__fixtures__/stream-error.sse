@@ -1,0 +1,12 @@
+data: {"type":"start","messageId":"423ab169-cf5d-4a6b-93c4-68754351d035"}
+
+data: {"type":"start-step"}
+
+data: {"type":"error","errorText":"No se pudo generar la respuesta en este momento. Puedes reintentar o escribirle al equipo de Fab Lab."}
+
+data: {"type":"finish-step"}
+
+data: {"type":"finish","finishReason":"error"}
+
+data: [DONE]
+

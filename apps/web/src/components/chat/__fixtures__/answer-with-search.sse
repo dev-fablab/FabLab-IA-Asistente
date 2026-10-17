@@ -1,0 +1,24 @@
+data: {"type":"start","messageId":"308e4ff5-c1c1-4fee-bacc-c104af566ee8"}
+
+data: {"type":"start-step"}
+
+data: {"type":"tool-input-available","toolCallId":"call-0","toolName":"searchDocuments","input":{"query":"Fab Lab ofrece impresión 3D, corte láser y electrónica para toda la comunidad."}}
+
+data: {"type":"tool-output-available","toolCallId":"call-0","output":{"found":true,"passages":[{"text":"Fab Lab ofrece impresión 3D, corte láser y electrónica para toda la comunidad.","title":"Guía de servicios it-6jgwgk","page":2,"score":1}]}}
+
+data: {"type":"finish-step"}
+
+data: {"type":"start-step"}
+
+data: {"type":"text-start","id":"text-1"}
+
+data: {"type":"text-delta","id":"text-1","delta":"Según la guía de servicios, Fab Lab ofrece **impresión 3D** y corte láser."}
+
+data: {"type":"text-end","id":"text-1"}
+
+data: {"type":"finish-step"}
+
+data: {"type":"finish","finishReason":"stop"}
+
+data: [DONE]
+

@@ -1,0 +1,24 @@
+data: {"type":"start","messageId":"dd0f9a8f-606a-4dfc-abab-cd9273a238fb"}
+
+data: {"type":"start-step"}
+
+data: {"type":"tool-input-available","toolCallId":"call-0","toolName":"getContactInfo","input":{}}
+
+data: {"type":"tool-output-available","toolCallId":"call-0","output":{"channels":[{"type":"email","label":"it-6jgwgk Correo","value":"fablab@example.cl","notes":"Responde en 24 h"},{"type":"phone","label":"it-6jgwgk Teléfono","value":"+56 9 1234 5678","notes":null}]}}
+
+data: {"type":"finish-step"}
+
+data: {"type":"start-step"}
+
+data: {"type":"text-start","id":"text-1"}
+
+data: {"type":"text-delta","id":"text-1","delta":"Agendar aún no está disponible. Puedes contactar al equipo por estos canales."}
+
+data: {"type":"text-end","id":"text-1"}
+
+data: {"type":"finish-step"}
+
+data: {"type":"finish","finishReason":"stop"}
+
+data: [DONE]
+

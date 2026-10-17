@@ -1,0 +1,24 @@
+data: {"type":"start","messageId":"6590f94b-f6f5-4e78-bbb2-7303d4211d8f"}
+
+data: {"type":"start-step"}
+
+data: {"type":"tool-input-available","toolCallId":"call-0","toolName":"searchDocuments","input":{"query":"FALLA-EMBEDDINGS"}}
+
+data: {"type":"tool-output-available","toolCallId":"call-0","output":{"found":false,"passages":[],"unavailable":true}}
+
+data: {"type":"finish-step"}
+
+data: {"type":"start-step"}
+
+data: {"type":"text-start","id":"text-1"}
+
+data: {"type":"text-delta","id":"text-1","delta":"Tuve un problema técnico al consultar la documentación. Inténtalo de nuevo en un momento."}
+
+data: {"type":"text-end","id":"text-1"}
+
+data: {"type":"finish-step"}
+
+data: {"type":"finish","finishReason":"stop"}
+
+data: [DONE]
+
