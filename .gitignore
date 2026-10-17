@@ -1,0 +1,23 @@
+node_modules/
+.next/
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+# Secretos: solo .env.example se versiona
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Mastra
+.mastra/
+
+# Resultados de la evaluación del agente
+tests/eval/results/
+
+.DS_Store
