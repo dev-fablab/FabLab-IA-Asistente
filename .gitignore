@@ -4,6 +4,7 @@ dist/
 coverage/
 .turbo/
 *.tsbuildinfo
+apps/web/public/voice-assets/
 
 # Secretos: solo .env.example se versiona
 .env

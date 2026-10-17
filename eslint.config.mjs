@@ -10,6 +10,7 @@ export default defineConfig([
     '**/.next/**',
     '**/dist/**',
     '**/coverage/**',
+    'apps/web/public/voice-assets/**',
     'packages/db/drizzle/**',
     'apps/web/next-env.d.ts',
     // Código generado por shadcn/ui y Assistant UI: se actualiza con sus CLI, no a mano.

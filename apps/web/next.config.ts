@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: '/voice-assets/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
+      },
+      {
         // La API (/api) ya aplica sus propias cabeceras desde Hono.
         source: '/((?!api).*)',
         headers: [

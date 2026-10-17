@@ -8,6 +8,7 @@ allowBuilds:
   esbuild: true
   supabase: true
   unrs-resolver: true
+  protobufjs: false
 
 minimumReleaseAgeExclude:
   - '@ai-sdk/gateway@4.0.116'
