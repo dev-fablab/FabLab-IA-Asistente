@@ -55,6 +55,11 @@ export async function saveUserMessage(
       .values({ id: conversationId, channel, firstMessage: content.slice(0, FIRST_MESSAGE_MAX) })
       .onConflictDoNothing();
 
+    // Una conversación puede mezclar texto y voz; el canal queda marcado desde el primer turno hablado.
+    if (channel === 'voice') {
+      await tx.update(conversations).set({ channel: 'voice' }).where(eq(conversations.id, conversationId));
+    }
+
     let last = await latestMessage(tx, conversationId);
     if (regenerate && last?.role === 'assistant') {
       await tx.delete(messages).where(eq(messages.id, last.id));

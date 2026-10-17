@@ -9,6 +9,7 @@ import { requestLog } from './middleware/request-log';
 import { requireStaff } from './middleware/require-staff';
 import { createAdminRoutes } from './routes/admin';
 import { createChatRoutes } from './routes/chat';
+import { createVoiceRoutes } from './routes/voice';
 import type { AuthDeps, ScheduleBackground } from './types';
 
 export type CreateAppOptions<BasePath extends string = string> = {
@@ -52,6 +53,7 @@ export function createApp<const BasePath extends string = '/api'>(options: Creat
     .get('/health', (c) => c.json({ ok: true }))
     // Público, con límite de tasa: el chat anónimo.
     .route('/chat', createChatRoutes({ limiter: rateLimiter }))
+    .route('/voice', createVoiceRoutes(rateLimiter))
     // Toda ruta bajo /admin exige JWT válido y perfil, sin excepciones.
     .use('/admin/*', requireStaff(auth))
     .route('/admin', createAdminRoutes({ scheduleBackground }));

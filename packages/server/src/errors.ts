@@ -11,6 +11,7 @@ export type ErrorCode =
   | 'payload_too_large'
   | 'unsupported_media_type'
   | 'rate_limited'
+  | 'voice_unavailable'
   | 'internal_error';
 
 export type ErrorBody = { error: { code: ErrorCode; message: string } };

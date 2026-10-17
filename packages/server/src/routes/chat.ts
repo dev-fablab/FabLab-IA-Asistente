@@ -2,6 +2,7 @@ import { ensureMastraReady, getMastra } from '@fablab/agent';
 import { getChatEnv, getEmbeddingEnv } from '@fablab/agent/env';
 import { listActiveContactChannels } from '@fablab/db';
 import { handleChatStream } from '@mastra/ai-sdk';
+import { RequestContext } from '@mastra/core/request-context';
 import { createUIMessageStreamResponse } from 'ai';
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
@@ -51,6 +52,10 @@ export function createChatRoutes({ limiter }: ChatRoutesOptions) {
       async (c) => {
         const body = c.req.valid('json');
         const thread = sanitizeThread(body.messages);
+        const channel = body.channel ?? 'web';
+        const modality = channel === 'voice' ? 'voice' : 'text';
+        const requestContext = new RequestContext();
+        requestContext.set('channel', channel);
 
         // Registra con la conversación y la petición (`child` conserva el `requestId` aunque los callbacks
         // del stream corran después de responder). Solo cantidades: nunca el texto de la persona.
@@ -77,6 +82,8 @@ export function createChatRoutes({ limiter }: ChatRoutesOptions) {
 
         await saveUserMessage(body.id, lastUserText(thread), {
           regenerate: body.trigger === 'regenerate-message',
+          channel,
+          modality,
         });
 
         // `onFinish` y `onAbort` (la persona detuvo la respuesta) guardan lo mismo: una sola vez.
@@ -87,7 +94,7 @@ export function createChatRoutes({ limiter }: ChatRoutesOptions) {
           const content = textOfSteps(event.steps, event.text);
           if (!content) return;
           try {
-            await saveAssistantMessage(body.id, { content, noAnswer: detectNoAnswer(event.steps) });
+            await saveAssistantMessage(body.id, { content, noAnswer: detectNoAnswer(event.steps), modality });
           } catch (error) {
             // La respuesta ya se entregó: un fallo al guardarla solo se registra.
             log.error('chat.persist_failed', error);
@@ -107,6 +114,8 @@ export function createChatRoutes({ limiter }: ChatRoutesOptions) {
           // `params`, que acepta opciones de ejecución del agente.
           params: { messages: thread, ...(body.trigger && { trigger: body.trigger }) },
           defaultOptions: {
+            requestContext,
+            abortSignal: c.req.raw.signal,
             onChunk: createChunkLogger(log, elapsed),
             // Un paso por llamada al modelo: cuál respondió, tokens y qué herramientas usó (máximo 5 por turno).
             onStepFinish: (step) => log.info('chat.step', { ...summarizeStep(step), ms: elapsed() }),

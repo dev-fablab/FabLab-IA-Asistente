@@ -20,6 +20,7 @@ export const chatBodySchema = z.object({
   id: z.uuid(),
   messages: z.array(uiMessageSchema).min(1).max(500),
   trigger: z.enum(['submit-message', 'regenerate-message']).optional(),
+  channel: z.enum(['web', 'voice']).optional(),
 });
 
 export type ChatBody = z.infer<typeof chatBodySchema>;
