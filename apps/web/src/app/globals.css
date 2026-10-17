@@ -1,0 +1,164 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: var(--font-sans);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-brand: var(--brand);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+  @keyframes collapsible-down {
+  from {
+    height: 0;
+        }
+  to {
+    height: var(--radix-collapsible-content-height, var(--collapsible-panel-height, auto));
+        }
+    }
+  @keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height, var(--collapsible-panel-height, auto));
+        }
+  to {
+    height: 0;
+        }
+    }
+}
+
+:root {
+    /*
+     * Identidad de INACAP. Los valores salen del logo institucional: rojo #ED1C24 y carbón #231F20 sobre
+     * blanco. El rojo exacto (--brand) queda para elementos decorativos; --primary es #E70E1D (mismo tono,
+     * apenas más oscuro) porque el exacto da 4,38:1 con texto blanco y AA exige 4,5:1 en texto pequeño.
+     */
+    --brand: oklch(0.603 0.235 27);
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.244 0.006 0.6);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.244 0.006 0.6);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.244 0.006 0.6);
+    --primary: oklch(0.587 0.235 27);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.955 0.004 17);
+    --secondary-foreground: oklch(0.244 0.006 0.6);
+    --muted: oklch(0.969 0.002 17);
+    --muted-foreground: oklch(0.5 0.01 10);
+    --accent: oklch(0.955 0.014 20);
+    --accent-foreground: oklch(0.244 0.006 0.6);
+    --destructive: oklch(0.5 0.21 22);
+    --success: oklch(0.45 0.12 150);
+    --warning: oklch(0.46 0.1 70);
+    --border: oklch(0.915 0.004 17);
+    --input: oklch(0.88 0.005 17);
+    --ring: oklch(0.65 0.2 27);
+    --chart-1: oklch(0.587 0.235 27);
+    --chart-2: oklch(0.244 0.006 0.6);
+    --chart-3: oklch(0.5 0.01 10);
+    --chart-4: oklch(0.75 0.12 27);
+    --chart-5: oklch(0.88 0.005 17);
+    --radius: 0.625rem;
+    /* Barra lateral en carbón del logo, con el rojo para lo activo. */
+    --sidebar: oklch(0.244 0.006 0.6);
+    --sidebar-foreground: oklch(0.97 0.002 17);
+    --sidebar-primary: oklch(0.587 0.235 27);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.335 0.007 3.8);
+    --sidebar-accent-foreground: oklch(1 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.65 0.2 27);
+}
+
+.dark {
+    --brand: oklch(0.603 0.235 27);
+    --background: oklch(0.19 0.005 0.6);
+    --foreground: oklch(0.97 0.002 17);
+    --card: oklch(0.244 0.006 0.6);
+    --card-foreground: oklch(0.97 0.002 17);
+    --popover: oklch(0.244 0.006 0.6);
+    --popover-foreground: oklch(0.97 0.002 17);
+    --primary: oklch(0.587 0.235 27);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.3 0.007 3);
+    --secondary-foreground: oklch(0.97 0.002 17);
+    --muted: oklch(0.3 0.007 3);
+    --muted-foreground: oklch(0.72 0.01 10);
+    --accent: oklch(0.3 0.03 20);
+    --accent-foreground: oklch(0.97 0.002 17);
+    --destructive: oklch(0.7 0.19 22);
+    --success: oklch(0.75 0.15 150);
+    --warning: oklch(0.8 0.13 75);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.65 0.2 27);
+    --chart-1: oklch(0.65 0.22 27);
+    --chart-2: oklch(0.97 0.002 17);
+    --chart-3: oklch(0.72 0.01 10);
+    --chart-4: oklch(0.75 0.12 27);
+    --chart-5: oklch(0.45 0.007 3);
+    --sidebar: oklch(0.15 0.005 0.6);
+    --sidebar-foreground: oklch(0.97 0.002 17);
+    --sidebar-primary: oklch(0.587 0.235 27);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.28 0.007 3);
+    --sidebar-accent-foreground: oklch(1 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.65 0.2 27);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+@custom-variant data-open (&:where([data-state="open"], [data-open]:not([data-open="false"])));
+
+@custom-variant data-closed (&:where([data-state="closed"], [data-closed]:not([data-closed="false"])));
