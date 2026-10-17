@@ -20,6 +20,9 @@ import { Mascot } from './mascot/mascot';
 import { toolUIs } from './tool-uis';
 import { TypingIndicator } from './typing-indicator';
 import { useForwardWheel } from './use-forward-wheel';
+import { VoiceStatus, VoiceToggle } from './voice-controls';
+import { useVoiceControls } from '@/lib/voice/use-voice';
+import { MobileVoiceControls } from './mobile-voice-controls';
 
 const isEmptyThread = (s: { thread: { messages: readonly unknown[] } }) => s.thread.messages.length === 0;
 
@@ -60,7 +63,7 @@ const UserMessage: FC = () => (
 );
 
 const AssistantActionBar: FC = () => (
-  <ActionBarPrimitive.Root hideWhenRunning autohide="not-last" className="-ms-1 flex gap-1 text-muted-foreground">
+  <ActionBarPrimitive.Root autohide="never" className="-ms-1 flex gap-1 text-muted-foreground">
     <ActionBarPrimitive.Copy asChild>
       <TooltipIconButton tooltip="Copiar respuesta">
         <AuiIf condition={(s) => s.message.isCopied}>
@@ -81,6 +84,9 @@ const AssistantActionBar: FC = () => (
 
 const AssistantMessage: FC = () => {
   const running = useAuiState((s) => s.message.status?.type === 'running');
+  const interrupted = useAuiState((s) => s.message.status?.type === 'incomplete' && s.message.status.reason === 'cancelled');
+  const messageId = useAuiState((s) => s.message.id);
+  const voice = useVoiceControls();
 
   return (
     <MessagePrimitive.Root data-role="assistant" className="flex flex-col gap-1 px-2">
@@ -88,6 +94,7 @@ const AssistantMessage: FC = () => {
         <MessagePrimitive.Parts components={{ Text: MarkdownText, tools: toolUIs }} />
         {running && <TypingIndicator />}
         <ChatError />
+        {(interrupted || voice.interrupted.has(messageId)) && <p className="text-xs text-muted-foreground">Respuesta interrumpida</p>}
       </div>
       <AssistantActionBar />
     </MessagePrimitive.Root>
@@ -99,8 +106,11 @@ const ThreadMessage: FC = () => {
   return role === 'user' ? <UserMessage /> : <AssistantMessage />;
 };
 
-const Composer: FC = () => (
-  <ComposerPrimitive.Root className="flex items-end gap-2 rounded-2xl border bg-muted/30 p-2 transition-colors focus-within:border-foreground/30">
+const Composer: FC = () => {
+  const voice = useVoiceControls();
+  return (
+  <>
+  <ComposerPrimitive.Root onSubmitCapture={() => voice.stop()} className={`${voice.state !== 'idle' ? 'hidden lg:flex' : 'flex'} items-end gap-2 rounded-2xl border bg-muted/30 p-2 transition-colors focus-within:border-foreground/30`}>
     <ComposerPrimitive.Input
       placeholder="Escribe tu pregunta…"
       aria-label="Escribe tu mensaje"
@@ -109,6 +119,7 @@ const Composer: FC = () => (
       enterKeyHint="send"
       className="max-h-40 min-h-10 w-full resize-none bg-transparent px-2.5 py-2 text-base leading-6 outline-none placeholder:text-muted-foreground"
     />
+    <VoiceToggle />
     <AuiIf condition={(s) => !s.thread.isRunning}>
       <ComposerPrimitive.Send asChild>
         <Button type="submit" size="icon" className="shrink-0 rounded-full" aria-label="Enviar mensaje">
@@ -124,7 +135,10 @@ const Composer: FC = () => (
       </ComposerPrimitive.Cancel>
     </AuiIf>
   </ComposerPrimitive.Root>
-);
+  <MobileVoiceControls />
+  </>
+  );
+};
 
 /** Hilo del chat: se diseña primero para móvil y se limita a 760 px de ancho (el contenedor lo fija). */
 export const Thread: FC = () => {
@@ -147,6 +161,7 @@ export const Thread: FC = () => {
 
       <div className="px-4 pt-2 pb-4">
         <Composer />
+        <VoiceStatus />
         <p className="mt-2 text-center text-xs text-muted-foreground">{PRIVACY_NOTICE}</p>
       </div>
     </ThreadPrimitive.Root>

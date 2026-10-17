@@ -54,7 +54,7 @@ export function ChatApp() {
           </Button>
         </header>
 
-        <div className="mx-auto flex min-h-0 w-full max-w-[760px] flex-1 flex-col">
+        <div className="flex min-h-0 w-full flex-1 flex-col">
           {conversation ? (
             <ChatSession
               key={conversation.conversationId}
@@ -62,7 +62,7 @@ export function ChatApp() {
               initialMessages={conversation.initialMessages}
             />
           ) : (
-            <div className="flex flex-col gap-3 p-4" role="status" aria-label="Cargando la conversación">
+            <div className="mx-auto flex w-full max-w-[760px] flex-col gap-3 p-4" role="status" aria-label="Cargando la conversación">
               <Skeleton className="h-8 w-2/3" />
               <Skeleton className="h-20 w-full" />
             </div>
