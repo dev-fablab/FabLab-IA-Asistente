@@ -1,15 +1,41 @@
-import { FileText, MessagesSquare, Phone, type LucideIcon } from 'lucide-react';
+import { CalendarClock, CalendarDays, FileText, MessagesSquare, Phone, Sparkle, Users, type LucideIcon } from 'lucide-react';
 
-export type AdminNavItem = {
+export type AdminNavLink = {
   href: string;
   label: string;
   icon: LucideIcon;
 };
 
-// Fase 1: tres secciones. Calendario e Inventario (fases posteriores) se agregan aquí
-// sin rediseñar el sidebar.
+/**
+ * Una sección del sidebar. Con `children` es un grupo desplegable.
+ * Está activa si la ruta cae en `href` o en cualquiera de sus páginas.
+ */
+export type AdminNavItem = AdminNavLink & { children?: AdminNavLink[] };
+
+// Conocimiento (Documentos y Contacto), Historial y Calendario (Personas y Agenda). El Inventario (fase
+// posterior) se agrega aquí sin rediseñar el sidebar.
 export const adminNavItems: AdminNavItem[] = [
-  { href: '/admin/documents', label: 'Documentos', icon: FileText },
+  {
+    // No es una ruta: Documentos y Contacto no comparten prefijo. Sirve de clave del grupo.
+    href: '/admin/conocimiento',
+    label: 'Conocimiento',
+    icon: Sparkle,
+    children: [
+      { href: '/admin/documents', label: 'Documentos', icon: FileText },
+      { href: '/admin/contact', label: 'Contacto', icon: Phone },
+    ],
+  },
   { href: '/admin/conversations', label: 'Historial', icon: MessagesSquare },
-  { href: '/admin/contact', label: 'Contacto', icon: Phone },
+  {
+    href: '/admin/calendar',
+    label: 'Calendario',
+    icon: CalendarDays,
+    children: [
+      { href: '/admin/calendar/people', label: 'Personas', icon: Users },
+      { href: '/admin/calendar/agenda', label: 'Agenda', icon: CalendarClock },
+    ],
+  },
 ];
+
+/** ¿Está la ruta actual dentro de esta página o de alguna de sus subpáginas? */
+export const isWithin = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);

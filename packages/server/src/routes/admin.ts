@@ -1,9 +1,11 @@
 import { Hono } from 'hono';
 import { createEnqueueIngestion } from '../ingest/enqueue';
 import type { AppEnv, ScheduleBackground } from '../types';
+import { createCalendarRoutes } from './calendar';
 import { createContactChannelRoutes } from './contact-channels';
 import { createConversationRoutes } from './conversations';
 import { createDocumentRoutes } from './documents';
+import { createTeamRoutes } from './team';
 
 export type AdminRoutesOptions = {
   scheduleBackground: ScheduleBackground;
@@ -20,5 +22,7 @@ export function createAdminRoutes({ scheduleBackground }: AdminRoutesOptions) {
     .get('/me', (c) => c.json(c.get('staff')))
     .route('/documents', createDocumentRoutes({ enqueueIngestion }))
     .route('/conversations', createConversationRoutes())
-    .route('/contact-channels', createContactChannelRoutes());
+    .route('/contact-channels', createContactChannelRoutes())
+    .route('/calendar', createCalendarRoutes())
+    .route('/team', createTeamRoutes());
 }

@@ -1,8 +1,10 @@
 'use client';
 
-import { LogOut } from 'lucide-react';
+import { ChevronRight, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -14,10 +16,56 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { BrandMark } from '@/components/brand-mark';
 import { createClient } from '@/lib/supabase/client';
-import { adminNavItems } from './nav-items';
+import { adminNavItems, isWithin, type AdminNavItem } from './nav-items';
+
+/**
+ * Sección con subpáginas: un botón que despliega sus enlaces. Está abierta mientras se navega dentro de ella; si la
+ * persona la abre o la cierra a mano, se respeta su elección hasta que cambie.
+ */
+function NavGroup({ item, pathname }: { item: AdminNavItem & { children: NonNullable<AdminNavItem['children']> }; pathname: string }) {
+  const active = isWithin(pathname, item.href) || item.children.some((child) => isWithin(pathname, child.href));
+  const [chosen, setChosen] = useState<boolean | null>(null);
+  const open = chosen ?? active;
+  const Icon = item.icon;
+
+  return (
+    <Collapsible open={open} onOpenChange={setChosen} asChild>
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton isActive={active && !open} className="data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground">
+            <Icon />
+            <span>{item.label}</span>
+            <ChevronRight className={`ml-auto transition-transform ${open ? 'rotate-90' : ''}`} aria-hidden />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub aria-label={item.label}>
+            {item.children.map(({ href, label, icon: ChildIcon }) => (
+              <SidebarMenuSubItem key={href}>
+                <SidebarMenuSubButton
+                  asChild
+                  isActive={isWithin(pathname, href)}
+                  className="data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground data-active:[&>svg]:text-sidebar-primary-foreground"
+                >
+                  <Link href={href} aria-current={isWithin(pathname, href) ? 'page' : undefined}>
+                    <ChildIcon />
+                    <span>{label}</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
+  );
+}
 
 export function AdminSidebar({ email }: { email?: string }) {
   const pathname = usePathname();
@@ -46,20 +94,24 @@ export function AdminSidebar({ email }: { email?: string }) {
           <SidebarGroupLabel>Gestión</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {adminNavItems.map(({ href, label, icon: Icon }) => (
-                <SidebarMenuItem key={href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname.startsWith(href)}
-                    className="data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground"
-                  >
-                    <Link href={href}>
-                      <Icon />
-                      <span>{label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {adminNavItems.map((item) =>
+                item.children ? (
+                  <NavGroup key={item.href} item={{ ...item, children: item.children }} pathname={pathname} />
+                ) : (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isWithin(pathname, item.href)}
+                      className="data-active:bg-sidebar-primary data-active:text-sidebar-primary-foreground"
+                    >
+                      <Link href={item.href} aria-current={isWithin(pathname, item.href) ? 'page' : undefined}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ),
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
