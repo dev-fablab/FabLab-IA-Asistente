@@ -12,7 +12,7 @@ data: {"type":"start-step"}
 
 data: {"type":"text-start","id":"text-1"}
 
-data: {"type":"text-delta","id":"text-1","delta":"Agendar aún no está disponible. Puedes contactar al equipo por estos canales."}
+data: {"type":"text-delta","id":"text-1","delta":"Puedes contactar al equipo por estos canales."}
 
 data: {"type":"text-end","id":"text-1"}
 

@@ -136,14 +136,19 @@ describe('evaluate: búsqueda caída', () => {
 });
 
 describe('evaluate: agendar y fuera de tema', () => {
-  it('agendar: avisa que aún no está disponible y entrega el contacto', () => {
+  it('agendar: consulta los horarios reales y no reserva ni afirma haber reservado', () => {
+    const slots: AgentRun['toolCalls'][number] = { name: 'getAvailableSlots', result: { days: [] } };
     const run: AgentRun = {
-      answer: 'Agendar citas aún no está disponible. Escríbenos por correo.',
-      toolCalls: [contact],
+      answer: 'Tengo estos horarios libres. ¿Cuál te acomoda? Necesito tu nombre, correo y el motivo.',
+      toolCalls: [slots],
     };
     expect(evaluate(question({ category: 'scheduling' }), run).pass).toBe(true);
     expect(evaluate(question({ category: 'scheduling' }), { ...run, answer: 'Listo, te agendé para el martes.' }).pass).toBe(false);
+    expect(evaluate(question({ category: 'scheduling' }), { ...run, answer: 'La reunión quedó agendada.' }).pass).toBe(false);
     expect(evaluate(question({ category: 'scheduling' }), { ...run, toolCalls: [] }).pass).toBe(false);
+    expect(
+      evaluate(question({ category: 'scheduling' }), { ...run, toolCalls: [slots, { name: 'scheduleMeeting', result: { status: 'needs_info' } }] }).pass,
+    ).toBe(false);
   });
 
   it('fuera de tema: recuerda de qué puede ayudar y requiere revisión', () => {

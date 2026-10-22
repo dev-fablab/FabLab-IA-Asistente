@@ -52,6 +52,8 @@ const TOOL_LABELS: Record<string, string> = {
   searchDocuments: 'Revisando la documentación…',
   getDocumentLink: 'Buscando el documento…',
   getContactInfo: 'Consultando los canales de contacto…',
+  getAvailableSlots: 'Revisando los horarios disponibles…',
+  scheduleMeeting: 'Agendando la reunión…',
 };
 
 /** Texto del indicador mientras la respuesta está en curso: la herramienta que corre o «Escribiendo…». */

@@ -1,6 +1,6 @@
 import { ensureMastraReady, getMastra } from '@fablab/agent';
 import { getChatEnv, getEmbeddingEnv } from '@fablab/agent/env';
-import { listActiveContactChannels } from '@fablab/db';
+import { listActiveContactChannels, listConversationMeetings } from '@fablab/db';
 import { handleChatStream } from '@mastra/ai-sdk';
 import { RequestContext } from '@mastra/core/request-context';
 import { createUIMessageStreamResponse } from 'ai';
@@ -36,8 +36,8 @@ export type ChatRoutesOptions = {
 
 /**
  * Chat público (anónimo): límite de tasa, validación, persistencia del historial y la respuesta
- * del agente en streaming. Las herramientas del agente son de solo lectura, así que no hay
- * nada que un mensaje pueda modificar.
+ * del agente en streaming. Todas las herramientas del agente son de solo lectura salvo `scheduleMeeting`,
+ * que crea una reunión: la valida y la acota la propia herramienta (horario, topes), no el chat.
  */
 export function createChatRoutes({ limiter }: ChatRoutesOptions) {
   return new Hono()
@@ -56,6 +56,8 @@ export function createChatRoutes({ limiter }: ChatRoutesOptions) {
         const modality = channel === 'voice' ? 'voice' : 'text';
         const requestContext = new RequestContext();
         requestContext.set('channel', channel);
+        // Las herramientas de agenda ligan la reunión a esta conversación; el modelo no lo elige.
+        requestContext.set('conversationId', body.id);
 
         // Registra con la conversación y la petición (`child` conserva el `requestId` aunque los callbacks
         // del stream corran después de responder). Solo cantidades: nunca el texto de la persona.
@@ -85,6 +87,17 @@ export function createChatRoutes({ limiter }: ChatRoutesOptions) {
           channel,
           modality,
         });
+
+        // El hilo del navegador solo conserva el texto: los resultados de las herramientas se descartan (ver
+        // `sanitizeThread`). Sin esto el agente no sabría en el turno siguiente si una reserva se concretó, así que
+        // el estado de las reuniones sale de la base de datos y se le entrega en las instrucciones.
+        try {
+          requestContext.set('conversationMeetings', await listConversationMeetings(body.id));
+        } catch (error) {
+          // Sin el estado el agente no debe afirmar ni negar una reserva; el chat sigue funcionando.
+          log.error('chat.meetings_state_failed', error);
+          requestContext.set('conversationMeetings', 'unknown');
+        }
 
         // `onFinish` y `onAbort` (la persona detuvo la respuesta) guardan lo mismo: una sola vez.
         let persisted = false;

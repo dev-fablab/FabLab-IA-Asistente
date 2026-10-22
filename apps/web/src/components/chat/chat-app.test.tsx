@@ -214,13 +214,29 @@ describe('Chat: tarjetas de herramientas', () => {
   it('getContactInfo muestra cada canal con enlaces tel: y mailto:', async () => {
     chatHandler = () => sse(fixture('contact-tool'));
     const user = await openChat();
-    await user.type(screen.getByRole('textbox', { name: 'Escribe tu mensaje' }), 'Quiero agendar una hora{Enter}');
+    await user.type(screen.getByRole('textbox', { name: 'Escribe tu mensaje' }), '¿Cómo puedo contactar al equipo?{Enter}');
 
     const card = await screen.findByRole('region', { name: 'Contacto de Fab Lab' });
     expect(within(card).getByRole('link', { name: '+56 9 1234 5678' })).toHaveAttribute('href', 'tel:+56912345678');
     expect(within(card).getByRole('link', { name: 'fablab@example.cl' })).toHaveAttribute('href', 'mailto:fablab@example.cl');
     expect(within(card).getByText('Responde en 24 h')).toBeInTheDocument();
-    expect(screen.getByText(/Agendar aún no está disponible/)).toBeInTheDocument();
+  });
+
+  it('getAvailableSlots lista los horarios libres por día y scheduleMeeting confirma la reunión agendada', async () => {
+    chatHandler = () => sse(fixture('schedule-meeting'));
+    const user = await openChat();
+    await user.type(screen.getByRole('textbox', { name: 'Escribe tu mensaje' }), 'Quiero agendar una reunión{Enter}');
+
+    const slots = await screen.findByRole('region', { name: 'Horarios disponibles' });
+    expect(within(slots).getByText(/Reuniones presenciales de 60 minutos/)).toBeInTheDocument();
+    // Un día sin horarios libres no aparece; los bloques se muestran en la hora de Fab Lab (UTC-3 en octubre).
+    const times = within(slots.querySelector('ul[aria-label^="Horarios del"]') as HTMLElement).getAllByRole('listitem');
+    expect(times.map((item) => item.textContent)).toEqual(['08:00', '11:00']);
+    expect(within(slots).queryByText(/27 de octubre/)).not.toBeInTheDocument();
+
+    const booked = await screen.findByRole('region', { name: 'Reunión agendada' });
+    expect(within(booked).getByText(/lunes 26 de octubre, de 11:00 a 12:00/)).toBeInTheDocument();
+    expect(within(booked).getByText(/Presencial en Fab Lab · Quiero construir un robot/)).toBeInTheDocument();
   });
 
   it('getDocumentLink muestra el documento con un botón «Descargar»', async () => {

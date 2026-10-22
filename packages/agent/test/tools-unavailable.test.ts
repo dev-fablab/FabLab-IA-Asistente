@@ -5,6 +5,9 @@ const mocks = vi.hoisted(() => ({
   embedQuery: vi.fn(),
   listActiveContactChannels: vi.fn(),
   getDb: vi.fn(),
+  getAvailability: vi.fn(),
+  contactExists: vi.fn(),
+  bookMeeting: vi.fn(),
 }));
 
 vi.mock('../src/embeddings', () => ({ embedQuery: mocks.embedQuery, embedDocuments: vi.fn() }));
@@ -12,10 +15,15 @@ vi.mock('@fablab/db', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@fablab/db')>()),
   getDb: mocks.getDb,
   listActiveContactChannels: mocks.listActiveContactChannels,
+  getAvailability: mocks.getAvailability,
+  contactExists: mocks.contactExists,
+  bookMeeting: mocks.bookMeeting,
 }));
 
 import { getContactInfo } from '../src/tools/get-contact-info';
+import { getAvailableSlots } from '../src/tools/get-available-slots';
 import { getDocumentLink } from '../src/tools/get-document-link';
+import { scheduleMeeting } from '../src/tools/schedule-meeting';
 import { searchDocuments } from '../src/tools/search-documents';
 
 const run = (tool: { execute?: (input: never, context: never) => unknown }, input: object) =>
@@ -110,5 +118,38 @@ describe('getDocumentLink cuando falla', () => {
     });
     expect(await run(getDocumentLink, { query: 'guía de servicios' })).toEqual({ matches: [], unavailable: true });
     expect(JSON.parse(errors[0]!)).toMatchObject({ tool: 'getDocumentLink' });
+  });
+});
+
+describe('getAvailableSlots cuando falla', () => {
+  it('devuelve `unavailable`, que es distinto de «no hay horarios libres»', async () => {
+    mocks.getAvailability.mockRejectedValue(new Error('connection refused'));
+    expect(await run(getAvailableSlots, {})).toEqual({ timeZone: '', durationMinutes: 0, days: [], unavailable: true });
+    expect(JSON.parse(errors[0]!)).toMatchObject({ tool: 'getAvailableSlots' });
+  });
+});
+
+describe('scheduleMeeting cuando falla', () => {
+  const input = { name: 'Ana', email: 'ana@correo.cl', reason: 'Visita', startsAt: '2026-10-26T14:00:00.000Z' };
+
+  it('si falla la consulta del contacto no agenda nada y devuelve `unavailable`', async () => {
+    mocks.contactExists.mockRejectedValue(new Error('timeout'));
+    expect(await run(scheduleMeeting, input)).toEqual({ status: 'unavailable', unavailable: true });
+    expect(mocks.bookMeeting).not.toHaveBeenCalled();
+  });
+
+  it('si falla la reserva devuelve `unavailable` y no filtra los datos de la persona al registro', async () => {
+    mocks.contactExists.mockResolvedValue(false);
+    mocks.bookMeeting.mockRejectedValue(new Error('connection refused'));
+    expect(await run(scheduleMeeting, input)).toEqual({ status: 'unavailable', unavailable: true });
+    expect(JSON.parse(errors[0]!)).toMatchObject({ tool: 'scheduleMeeting' });
+    expect(errors[0]).not.toContain('ana@correo.cl');
+  });
+
+  it('si el horario se ocupa y también falla la búsqueda de alternativas, avisa en vez de lanzar', async () => {
+    mocks.contactExists.mockResolvedValue(true);
+    mocks.bookMeeting.mockResolvedValue({ status: 'slot_unavailable' });
+    mocks.getAvailability.mockRejectedValue(new Error('timeout'));
+    expect(await run(scheduleMeeting, input)).toEqual({ status: 'unavailable', unavailable: true });
   });
 });

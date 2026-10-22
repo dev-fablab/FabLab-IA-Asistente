@@ -18,7 +18,8 @@ export type Evaluation = {
 };
 
 const NO_INFO = /\bno (cuento|tengo|dispongo|encuentro|puedo (confirmar|asegurar))\b|\bno hay (información|datos)\b|no (est[aá]|aparece|figura) en (la|los) (documentaci[oó]n|documentos)/i;
-const NOT_AVAILABLE_YET = /(a[uú]n|todav[ií]a) no (est[aá]|esta) disponible|no (est[aá]|esta) disponible (a[uú]n|todav[ií]a|por ahora)|pr[oó]ximamente/i;
+/** Da por hecha la reserva: en un turno sin datos ni confirmación, eso es una invención. */
+const CLAIMS_BOOKED = /\b(te|lo|la) (he )?agend[eé](?!\p{L})|qued[oó] agendad[ao]|reserva (confirmada|lista)|ya (est[aá]|qued[oó]) (agendad|reservad)/iu;
 const STOP_WORDS = new Set(['para', 'como', 'sobre', 'entre', 'desde', 'hasta', 'este', 'esta', 'estos', 'estas', 'fablab', 'fab']);
 
 const normalize = (text: string) => text.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
@@ -99,8 +100,10 @@ export function evaluate(question: Question, run: AgentRun): Evaluation {
       break;
     }
     case 'scheduling': {
-      add('avisa que agendar aún no está disponible', NOT_AVAILABLE_YET.test(answer));
-      add('entrega los canales de contacto', called(run, 'getContactInfo'));
+      // Un turno solo trae la intención de agendar: faltan los datos y la confirmación, así que no se reserva.
+      add('consulta los horarios reales con getAvailableSlots', called(run, 'getAvailableSlots'));
+      add('no agenda sin datos ni confirmación', !called(run, 'scheduleMeeting'));
+      add('no afirma que la reunión quedó agendada', !CLAIMS_BOOKED.test(answer));
       break;
     }
     case 'off-topic': {
