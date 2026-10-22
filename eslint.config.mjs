@@ -13,8 +13,9 @@ export default defineConfig([
     'apps/web/public/voice-assets/**',
     'packages/db/drizzle/**',
     'apps/web/next-env.d.ts',
-    // Código generado por shadcn/ui y Assistant UI: se actualiza con sus CLI, no a mano.
+    // Código generado por shadcn/ui, el registro @reui y Assistant UI: se actualiza con sus CLI, no a mano.
     'apps/web/src/components/ui/**',
+    'apps/web/src/components/reui/**',
     'apps/web/src/components/assistant-ui/**',
     'apps/web/src/hooks/use-mobile.ts',
   ]),

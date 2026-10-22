@@ -17,7 +17,9 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.5.0",
     "@supabase/supabase-js": "2.118.0",
+    "date-fns": "^4.4.0",
     "drizzle-orm": "0.45.4",
     "postgres": "3.4.9",
     "zod": "4.6.7"
