@@ -1,0 +1,1 @@
+ALTER TABLE "contact_methods" ADD COLUMN "sort_order" integer DEFAULT 0 NOT NULL;

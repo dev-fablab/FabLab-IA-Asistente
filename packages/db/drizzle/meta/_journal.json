@@ -36,6 +36,34 @@
       "when": 1792261658116,
       "tag": "0004_mastra_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792465244565,
+      "tag": "0005_calendar",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792468563830,
+      "tag": "0006_meeting_responsible",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792471547620,
+      "tag": "0007_people",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792471745145,
+      "tag": "0008_contact_methods_order",
+      "breakpoints": true
     }
   ]
 }
