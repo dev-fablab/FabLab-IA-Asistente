@@ -1,4 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { bookMeeting, contactExists, getAvailability, getDb, listActiveContactChannels } from '@fablab/db';
+
+type DbModule = {
+  getDb: typeof getDb;
+  listActiveContactChannels: typeof listActiveContactChannels;
+  getAvailability: typeof getAvailability;
+  contactExists: typeof contactExists;
+  bookMeeting: typeof bookMeeting;
+};
 
 // Se simulan las dependencias para forzar cada falla técnica.
 const mocks = vi.hoisted(() => ({
@@ -12,7 +21,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../src/embeddings', () => ({ embedQuery: mocks.embedQuery, embedDocuments: vi.fn() }));
 vi.mock('@fablab/db', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@fablab/db')>()),
+  ...(await importOriginal<DbModule>()),
   getDb: mocks.getDb,
   listActiveContactChannels: mocks.listActiveContactChannels,
   getAvailability: mocks.getAvailability,
