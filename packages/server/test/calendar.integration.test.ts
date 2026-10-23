@@ -549,6 +549,35 @@ describe('responsable de la reunión', () => {
     expect((await jsonOf(await admin('GET', `/meetings/${id}`))).responsible).toBeNull();
   });
 
+  it('permite crear manualmente una reunión con asociado y responsable existentes', async () => {
+    const contactResult = await bookMeeting({ email: email('manual-contacto'), name: 'Manual Contacto', reason: 'Preparación', startsAt: nextSlot() });
+    if (contactResult.status !== 'booked') throw new Error('No se pudo preparar el asociado');
+    const startsAt = nextSlot();
+    const response = await admin('POST', '/meetings', {
+      contactId: (await getDb().select({ id: contacts.id }).from(contacts).where(eq(contacts.email, email('manual-contacto'))))[0]!.id,
+      responsibleId: staff.id,
+      startsAt: startsAt.toISOString(),
+      durationMinutes: 90,
+      reason: 'Reunión creada por el equipo',
+    });
+
+    expect(response.status).toBe(201);
+    const detail = await jsonOf(response);
+    expect(detail.meeting).toMatchObject({ reason: 'Reunión creada por el equipo', conversationId: null });
+    expect(detail.responsible).toMatchObject({ id: staff.id });
+    expect(new Date(detail.meeting.endsAt).getTime() - new Date(detail.meeting.startsAt).getTime()).toBe(90 * 60_000);
+    expect(
+      (
+        await admin('POST', '/meetings', {
+          contactId: detail.meeting.contact.id,
+          responsibleId: staff.id,
+          startsAt: startsAt.toISOString(),
+          reason: 'Horario repetido',
+        })
+      ).status,
+    ).toBe(409);
+  });
+
   it('el equipo la asigna a una persona de staff o admin y la puede cambiar libremente, también quitar', async () => {
     const { id, startsAt } = await newMeeting('asigna');
 

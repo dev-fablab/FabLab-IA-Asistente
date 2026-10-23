@@ -11,6 +11,8 @@ import {
 import { createPerson, getPersonDetail, listPeople, MAX_CONTACT_METHODS, updatePerson } from '../services/people';
 import {
   addMinute,
+  createManualMeeting,
+  DEFAULT_MANUAL_MEETING_DURATION_MINUTES,
   deleteMinute,
   getMeetingDetail,
   listMeetings,
@@ -75,6 +77,14 @@ const meetingPatchBody = z
     message: 'Indica al menos un campo para editar',
   });
 
+const createManualMeetingBody = z.object({
+  contactId: z.uuid(),
+  responsibleId: z.uuid(),
+  startsAt: instant,
+  durationMinutes: z.coerce.number().int().min(15).max(480).default(DEFAULT_MANUAL_MEETING_DURATION_MINUTES),
+  reason: z.string().trim().min(1, 'Indica el motivo de la reunión').max(500),
+});
+
 const peopleQuery = z.object({
   page: z.coerce.number().int().min(1).max(100_000).default(1),
   q: z.string().trim().max(200).optional(),
@@ -105,6 +115,7 @@ const minuteBody = z.object({ content: z.string().trim().min(1, 'Escribe el punt
 export function createCalendarRoutes() {
   return new Hono<AppEnv>()
     .get('/meetings', validate('query', rangeQuery), async (c) => c.json(await listMeetings(c.req.valid('query'))))
+    .post('/meetings', validate('json', createManualMeetingBody), async (c) => c.json(await createManualMeeting(c.req.valid('json')), 201))
     .get('/meetings/:id', validate('param', idParam), async (c) => c.json(await getMeetingDetail(c.req.valid('param').id)))
     .patch('/meetings/:id', validate('param', idParam), validate('json', meetingPatchBody), async (c) =>
       c.json(await updateMeeting(c.req.valid('param').id, c.req.valid('json'))),

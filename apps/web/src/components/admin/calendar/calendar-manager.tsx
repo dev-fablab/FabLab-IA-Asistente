@@ -1,7 +1,7 @@
 'use client';
 
 import { es } from 'date-fns/locale';
-import { CalendarClock, Settings2 } from 'lucide-react';
+import { CalendarClock, Plus, Settings2 } from 'lucide-react';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { EventCalendar } from '@/components/reui/event-calendar/event-calendar';
 import { EventCalendarContent } from '@/components/reui/event-calendar/event-calendar-content';
@@ -16,12 +16,13 @@ import { ErrorAlert } from '../error-alert';
 import { PageHeader } from '../page-header';
 import { AvailabilityEditor } from './availability-editor';
 import { MeetingDetailDialog } from './meeting-detail-dialog';
+import { ManualMeetingDialog } from './manual-meeting-dialog';
 import { useMeetingMover } from './use-meeting-mover';
 
 // Constantes de módulo: el calendario compara estas props por identidad en cada render.
 const VIEWS: CalendarView[] = ['week', 'day', 'month', 'agenda'];
-// Las reuniones las crea el asistente: desde el calendario solo se arrastran para reagendarlas. No se redimensionan
-// (la duración es fija) ni se crean seleccionando un tramo vacío.
+// Las reuniones no se crean seleccionando un tramo vacío; se agendan desde el botón del encabezado. Desde el
+// calendario solo se arrastran para reagendarlas y no se redimensionan.
 const INTERACTIONS: Partial<EventCalendarInteractions> = { drag: true, resize: false, selectSlot: false };
 
 const I18N: EventCalendarI18nOverrides = {
@@ -87,6 +88,7 @@ export function CalendarManager() {
   const [reload, setReload] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingAvailability, setEditingAvailability] = useState(false);
+  const [creatingMeeting, setCreatingMeeting] = useState(false);
 
   const key = range ? `${range.start.toISOString()}|${range.end.toISOString()}` : null;
 
@@ -141,11 +143,16 @@ export function CalendarManager() {
       <PageHeader
         icon={CalendarClock}
         title="Agenda"
-        description="Reuniones presenciales que el asistente agenda con las personas. Haz clic en una para ver quién la pidió, el resumen de la conversación y el acta; arrástrala para reagendarla."
+        description="Reuniones presenciales agendadas por el asistente o por el equipo. Haz clic en una para ver sus detalles; arrástrala para reagendarla."
         actions={
-          <Button variant="outline" onClick={() => setEditingAvailability(true)}>
-            <Settings2 aria-hidden /> Disponibilidad
-          </Button>
+          <div className="flex flex-wrap gap-2 pt-1 pr-1">
+            <Button size="lg" onClick={() => setCreatingMeeting(true)}>
+              <Plus aria-hidden /> Agendar reunión
+            </Button>
+            <Button variant="outline" onClick={() => setEditingAvailability(true)}>
+              <Settings2 aria-hidden /> Disponibilidad
+            </Button>
+          </div>
         }
       />
 
@@ -211,6 +218,7 @@ export function CalendarManager() {
       </div>
 
       <MeetingDetailDialog meetingId={selectedId} onClose={() => setSelectedId(null)} onChanged={refresh} />
+      <ManualMeetingDialog open={creatingMeeting} onOpenChange={setCreatingMeeting} onCreated={refresh} />
       <AvailabilityEditor open={editingAvailability} onOpenChange={setEditingAvailability} onChanged={refresh} />
     </div>
   );

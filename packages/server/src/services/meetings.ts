@@ -5,6 +5,7 @@ import { listContactMethods } from './people';
 
 /** Rango máximo de una consulta: cubre el mes completo con las semanas de los bordes. */
 export const MAX_RANGE_DAYS = 100;
+export const DEFAULT_MANUAL_MEETING_DURATION_MINUTES = 60;
 
 /** Reuniones que tocan el rango, sin las canceladas (liberan el horario). */
 export async function listMeetings({ from, to }: { from: Date; to: Date }) {
@@ -27,6 +28,46 @@ export async function listMeetings({ from, to }: { from: Date; to: Date }) {
     .where(and(ne(meetings.status, 'cancelled'), lt(meetings.startsAt, to), gt(meetings.endsAt, from)))
     .orderBy(asc(meetings.startsAt));
   return { items };
+}
+
+export type ManualMeetingInput = {
+  contactId: string;
+  responsibleId: string;
+  startsAt: Date;
+  durationMinutes: number;
+  reason: string;
+};
+
+/** Crea una reserva desde el panel: exige datos existentes y solo aplica la regla de no solapamiento. */
+export async function createManualMeeting(input: ManualMeetingInput) {
+  const endsAt = new Date(input.startsAt.getTime() + input.durationMinutes * 60_000);
+  try {
+    const id = await getDb().transaction(async (tx) => {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext('fablab.meetings'))`);
+
+      const [contact] = await tx.select({ id: contacts.id }).from(contacts).where(eq(contacts.id, input.contactId));
+      if (!contact) throw badRequest('El asociado seleccionado no existe');
+
+      const [responsible] = await tx.select({ id: profiles.id }).from(profiles).where(eq(profiles.id, input.responsibleId));
+      if (!responsible) throw badRequest('El responsable seleccionado no existe');
+
+      const [meeting] = await tx
+        .insert(meetings)
+        .values({
+          contactId: input.contactId,
+          responsibleId: input.responsibleId,
+          startsAt: input.startsAt,
+          endsAt,
+          reason: input.reason.trim(),
+        })
+        .returning({ id: meetings.id });
+      return meeting!.id;
+    });
+    return getMeetingDetail(id);
+  } catch (error) {
+    if (isOverlapViolation(error)) throw conflict('Ese horario ya lo ocupa otra reunión');
+    throw error;
+  }
 }
 
 /** Una reunión con su solicitante, el resumen de la conversación que la originó y el acta. */
