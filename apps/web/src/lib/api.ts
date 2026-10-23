@@ -26,12 +26,24 @@ export class ApiRequestError extends Error {
   }
 }
 
+type ApiErrorBody = {
+  error?: { code?: string; message?: string };
+};
+
 /** Lanza `ApiRequestError` con el mensaje de la API si la respuesta no es exitosa. */
 export async function unwrap<T>(response: Response): Promise<T> {
-  if (response.ok) return (await response.json()) as T;
-  const body = (await response.json().catch(() => null)) as {
-    error?: { code?: string; message?: string };
-  } | null;
+  const text = await response.text();
+  if (response.ok) {
+    return (text ? JSON.parse(text) : undefined) as T;
+  }
+  let body: ApiErrorBody | null = null;
+  if (text) {
+    try {
+      body = JSON.parse(text) as ApiErrorBody;
+    } catch {
+      body = null;
+    }
+  }
   throw new ApiRequestError(
     body?.error?.message ?? 'No se pudo completar la solicitud',
     response.status,

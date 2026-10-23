@@ -1,9 +1,11 @@
 import { sql } from 'drizzle-orm';
 import {
+  type AnyPgColumn,
   bigint,
   boolean,
   check,
   date,
+  doublePrecision,
   index,
   integer,
   pgTable,
@@ -143,6 +145,15 @@ export type AvailabilityExceptionKind = (typeof AVAILABILITY_EXCEPTION_KINDS)[nu
 /** Cómo llegó la persona a Fab Lab la primera vez (la etiqueta «medio» del panel). `chat` es lo que registra el asistente. */
 export const CONTACT_SOURCES = ['chat', 'in_person', 'phone', 'whatsapp', 'email', 'social', 'other'] as const;
 export type ContactSource = (typeof CONTACT_SOURCES)[number];
+
+export const PROJECT_TASK_STATUSES = ['todo', 'in_progress', 'done'] as const;
+export type ProjectTaskStatus = (typeof PROJECT_TASK_STATUSES)[number];
+
+export const PROJECT_TASK_PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
+export type ProjectTaskPriority = (typeof PROJECT_TASK_PRIORITIES)[number];
+
+export const PROJECT_MEMBER_ROLES = ['admin', 'member'] as const;
+export type ProjectMemberRole = (typeof PROJECT_MEMBER_ROLES)[number];
 
 /**
  * Las personas que se relacionan con Fab Lab: las que piden una reunión por el chat y las que registra el equipo
@@ -288,6 +299,90 @@ export const meetingMinutes = pgTable(
   ],
 );
 
+export const projects = pgTable(
+  'projects',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    personId: uuid('person_id')
+      .notNull()
+      .references(() => contacts.id, { onDelete: 'restrict' }),
+    name: text('name').notNull(),
+    description: text('description'),
+    createdBy: uuid('created_by').references(() => profiles.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('projects_person_idx').on(t.personId),
+    index('projects_updated_at_idx').on(t.updatedAt),
+  ],
+);
+
+export const projectMembers = pgTable(
+  'project_members',
+  {
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    profileId: uuid('profile_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    role: text('role', { enum: PROJECT_MEMBER_ROLES }).notNull().default('member'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('project_members_project_profile_idx').on(t.projectId, t.profileId),
+    index('project_members_profile_idx').on(t.profileId),
+    check('project_members_role_check', sql`${t.role} in ('admin', 'member')`),
+  ],
+);
+
+export const tasks = pgTable(
+  'tasks',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    parentId: uuid('parent_id').references((): AnyPgColumn => tasks.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    description: text('description'),
+    status: text('status', { enum: PROJECT_TASK_STATUSES }).notNull().default('todo'),
+    priority: text('priority', { enum: PROJECT_TASK_PRIORITIES }).notNull().default('medium'),
+    position: doublePrecision('position').notNull().default(0),
+    dueDate: date('due_date', { mode: 'string' }),
+    assigneeId: uuid('assignee_id').references(() => profiles.id, { onDelete: 'set null' }),
+    assigneeName: text('assignee_name'),
+    createdBy: uuid('created_by').references(() => profiles.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('tasks_project_status_position_idx').on(t.projectId, t.status, t.position),
+    index('tasks_project_parent_idx').on(t.projectId, t.parentId),
+    index('tasks_assignee_idx').on(t.assigneeId),
+    check('tasks_status_check', sql`${t.status} in ('todo', 'in_progress', 'done')`),
+    check('tasks_priority_check', sql`${t.priority} in ('low', 'medium', 'high', 'urgent')`),
+  ],
+);
+
+export const comments = pgTable(
+  'comments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    taskId: uuid('task_id')
+      .notNull()
+      .references(() => tasks.id, { onDelete: 'cascade' }),
+    authorId: uuid('author_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'restrict' }),
+    content: text('content').notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('comments_task_created_idx').on(t.taskId, t.createdAt)],
+);
+
 export type Profile = typeof profiles.$inferSelect;
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
@@ -301,3 +396,9 @@ export type AvailabilityRule = typeof availabilityRules.$inferSelect;
 export type AvailabilityException = typeof availabilityExceptions.$inferSelect;
 export type Meeting = typeof meetings.$inferSelect;
 export type MeetingMinute = typeof meetingMinutes.$inferSelect;
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
+export type ProjectMember = typeof projectMembers.$inferSelect;
+export type Task = typeof tasks.$inferSelect;
+export type NewTask = typeof tasks.$inferInsert;
+export type Comment = typeof comments.$inferSelect;

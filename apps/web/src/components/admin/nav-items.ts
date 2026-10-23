@@ -1,4 +1,4 @@
-import { CalendarClock, CalendarDays, FileText, MessagesSquare, Phone, Sparkle, Users, type LucideIcon } from 'lucide-react';
+import { CalendarClock, CalendarDays, FileText, FolderKanban, MessagesSquare, Phone, Sparkle, Users, type LucideIcon } from 'lucide-react';
 
 export type AdminNavLink = {
   href: string;
@@ -26,6 +26,7 @@ export const adminNavItems: AdminNavItem[] = [
     ],
   },
   { href: '/admin/conversations', label: 'Historial', icon: MessagesSquare },
+  { href: '/admin/projects', label: 'Proyectos', icon: FolderKanban },
   {
     href: '/admin/calendar',
     label: 'Calendario',
