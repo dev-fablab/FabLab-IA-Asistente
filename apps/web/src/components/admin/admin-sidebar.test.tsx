@@ -158,3 +158,15 @@ describe('AdminSidebar: submenú de Calendario', () => {
     expect(screen.queryByRole('link', { name: 'Agenda' })).not.toBeInTheDocument();
   });
 });
+
+describe('AdminSidebar: accesos', () => {
+  it('el personal no ve la sección', () => {
+    renderSidebar('staff');
+    expect(screen.queryByRole('link', { name: 'Accesos' })).not.toBeInTheDocument();
+  });
+
+  it('un administrador ve la sección', () => {
+    renderSidebar('admin');
+    expect(screen.getByRole('link', { name: 'Accesos' })).toHaveAttribute('href', '/admin/users');
+  });
+});

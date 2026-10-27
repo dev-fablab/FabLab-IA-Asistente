@@ -7,6 +7,7 @@ import { createConversationRoutes } from './conversations';
 import { createDocumentRoutes } from './documents';
 import { createProjectRoutes } from './projects';
 import { createTeamRoutes } from './team';
+import { createUserRoutes } from './users';
 
 export type AdminRoutesOptions = {
   scheduleBackground: ScheduleBackground;
@@ -26,5 +27,6 @@ export function createAdminRoutes({ scheduleBackground }: AdminRoutesOptions) {
     .route('/contact-channels', createContactChannelRoutes())
     .route('/calendar', createCalendarRoutes())
     .route('/projects', createProjectRoutes())
-    .route('/team', createTeamRoutes());
+    .route('/team', createTeamRoutes())
+    .route('/users', createUserRoutes());
 }

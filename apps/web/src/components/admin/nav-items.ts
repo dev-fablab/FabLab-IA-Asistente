@@ -1,4 +1,4 @@
-import { CalendarClock, CalendarDays, FileText, FolderKanban, MessagesSquare, Phone, Sparkle, Users, type LucideIcon } from 'lucide-react';
+import { CalendarClock, CalendarDays, FileText, FolderKanban, KeyRound, MessagesSquare, Phone, Sparkle, Users, type LucideIcon } from 'lucide-react';
 
 export type AdminNavLink = {
   href: string;
@@ -36,6 +36,7 @@ export const adminNavItems: AdminNavItem[] = [
       { href: '/admin/calendar/agenda', label: 'Agenda', icon: CalendarClock },
     ],
   },
+  { href: '/admin/users', label: 'Accesos', icon: KeyRound, adminOnly: true },
 ];
 
 /** ¿Está la ruta actual dentro de esta página o de alguna de sus subpáginas? */
