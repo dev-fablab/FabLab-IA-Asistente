@@ -7,9 +7,7 @@ import { json, mockApi } from '@/test/fetch-mock';
 import { useMeetingMover } from './use-meeting-mover';
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({ auth: { getSession: async () => ({ data: { session: { access_token: 'jwt' } } }) } }),
-}));
+
 
 const ID = '00000000-0000-4000-8000-000000000042';
 // 2030-03-04 es lunes y Santiago está en UTC-3: las 11:00 locales son las 14:00 UTC.

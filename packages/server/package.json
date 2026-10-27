@@ -4,14 +4,17 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./auth": "./src/auth/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:integration": "INTEGRATION=1 vitest run"
+    "test:integration": "INTEGRATION=1 vitest run",
+    "seed-access": "tsx --env-file-if-exists=../../apps/web/.env.local scripts/seed-access.ts"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.7.13",
     "@fablab/agent": "workspace:*",
     "@fablab/db": "workspace:*",
     "@hono/zod-validator": "0.9.1",
@@ -19,9 +22,10 @@
     "@mastra/core": "1.78.0",
     "@mastra/rag": "2.6.7",
     "ai": "7.0.143",
+    "better-auth": "~1.7.13",
     "drizzle-orm": "0.45.4",
     "hono": "4.13.13",
-    "jose": "6.2.12",
+    "kysely": "0.29.7",
     "mammoth": "1.13.0",
     "unpdf": "1.9.0",
     "zod": "4.6.7"

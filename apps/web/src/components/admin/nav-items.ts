@@ -10,7 +10,7 @@ export type AdminNavLink = {
  * Una sección del sidebar. Con `children` es un grupo desplegable.
  * Está activa si la ruta cae en `href` o en cualquiera de sus páginas.
  */
-export type AdminNavItem = AdminNavLink & { children?: AdminNavLink[] };
+export type AdminNavItem = AdminNavLink & { children?: AdminNavLink[]; adminOnly?: boolean };
 
 // Conocimiento (Documentos y Contacto), Historial y Calendario (Personas y Agenda). El Inventario (fase
 // posterior) se agrega aquí sin rediseñar el sidebar.

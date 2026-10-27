@@ -220,7 +220,7 @@ describe('formatWait', () => {
 });
 
 describe('POST /api/chat (sin base de datos)', () => {
-  const auth = { verifyToken: async () => null, findProfile: async () => null };
+  const auth = { getUserId: async () => null, findProfile: async () => null };
   const post = (app: ReturnType<typeof createApp>, body: unknown, headers: Record<string, string> = {}) =>
     app.request('/api/chat', {
       method: 'POST',

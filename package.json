@@ -13,7 +13,7 @@
     "test": "pnpm -r --if-present test",
     "db:generate": "pnpm --filter @fablab/db generate",
     "db:migrate": "pnpm --filter @fablab/db migrate",
-    "db:seed-admin": "pnpm --filter @fablab/db seed-admin",
+    "db:seed-admin": "pnpm --filter @fablab/server seed-access",
     "eval": "pnpm --filter @fablab/eval eval",
     "supabase": "supabase",
     "test:integration": "pnpm --filter @fablab/server test:integration",

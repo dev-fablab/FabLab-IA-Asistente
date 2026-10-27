@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { requestId } from 'hono/request-id';
 import { secureHeaders } from 'hono/secure-headers';
 import { createDefaultAuthDeps } from './auth/deps';
+import { getAuth } from './auth/instance';
+import { whenSeeded } from './auth/seed-state';
 import { logger } from './logger';
 import { handleError, handleNotFound } from './middleware/error';
 import { createMemoryRateLimiter, type RateLimiter } from './middleware/rate-limit';
@@ -17,7 +19,7 @@ export type CreateAppOptions<BasePath extends string = string> = {
   basePath?: BasePath;
   /** Ejecuta trabajo tras responder. Por defecto lo lanza sin esperar (no apto para serverless). */
   scheduleBackground?: ScheduleBackground;
-  /** Dependencias de autenticación; por defecto verifican contra Supabase. */
+  /** Dependencias de autenticación; por defecto leen la sesión de Better Auth. */
   auth?: AuthDeps;
   /** Límite de tasa del chat público; por defecto en memoria (ver `createMemoryRateLimiter`). */
   rateLimiter?: RateLimiter;
@@ -51,10 +53,15 @@ export function createApp<const BasePath extends string = '/api'>(options: Creat
     .use(requestId())
     .use(requestLog())
     .get('/health', (c) => c.json({ ok: true }))
+    // Better Auth vive bajo el mismo origen. La app Hono ya tiene prefijo `/api`.
+    .all('/auth/*', async (c) => {
+      await whenSeeded();
+      return getAuth().handler(c.req.raw);
+    })
     // Público, con límite de tasa: el chat anónimo.
     .route('/chat', createChatRoutes({ limiter: rateLimiter }))
     .route('/voice', createVoiceRoutes(rateLimiter))
-    // Toda ruta bajo /admin exige JWT válido y perfil, sin excepciones.
+    // Toda ruta bajo /admin exige sesión y perfil, sin excepciones.
     .use('/admin/*', requireStaff(auth))
     .route('/admin', createAdminRoutes({ scheduleBackground }));
 

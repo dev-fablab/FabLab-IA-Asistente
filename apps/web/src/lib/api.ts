@@ -1,18 +1,14 @@
 import type { AppType } from '@fablab/server';
 import { hc } from 'hono/client';
-import { createClient } from '@/lib/supabase/client';
 
 /**
  * Cliente tipado de la API Hono (RPC). Un cambio de contrato en `packages/server`
  * rompe la compilación aquí en lugar de fallar en producción.
  *
- * Envía el JWT de la sesión de Supabase: la API lo verifica de forma independiente.
+ * La sesión viaja en la cookie de Better Auth, del mismo origen.
  */
 export const api = hc<AppType>('/', {
-  headers: async (): Promise<Record<string, string>> => {
-    const { data } = await createClient().auth.getSession();
-    return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {};
-  },
+  init: { credentials: 'include' },
 });
 
 /** Error de la API con el formato `{ error: { code, message } }`. */

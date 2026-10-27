@@ -12,7 +12,7 @@ let staff: TestUser;
 const call = async (method: string, path: string, body?: unknown) =>
   app.request(`/api/admin${path}`, {
     method,
-    headers: { authorization: `Bearer ${staff.token}`, ...(body ? { 'content-type': 'application/json' } : {}) },
+    headers: { cookie: staff.cookie, ...(body ? { 'content-type': 'application/json' } : {}) },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 

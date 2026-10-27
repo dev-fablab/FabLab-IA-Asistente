@@ -7,12 +7,15 @@ import type { AppEnv, AuthDeps } from '../src/types';
 
 const UUID = '00000000-0000-4000-8000-000000000000';
 
-// Tokens falsos: el verificador de prueba decide por el texto.
+// El doble lee el encabezado como lo hacía el JWT: las pruebas no necesitan una cookie real.
+const bearer = (headers: Headers) => headers.get('authorization')?.match(/^Bearer\s+(\S+)$/i)?.[1];
+
 const deps: AuthDeps = {
-  verifyToken: async (token) => {
-    if (token === 'staff-token') return { userId: 'staff-id' };
-    if (token === 'admin-token') return { userId: 'admin-id' };
-    if (token === 'no-profile-token') return { userId: 'ghost-id' };
+  getUserId: async (headers) => {
+    const token = bearer(headers);
+    if (token === 'staff-token') return 'staff-id';
+    if (token === 'admin-token') return 'admin-id';
+    if (token === 'no-profile-token') return 'ghost-id';
     return null;
   },
   findProfile: async (id) => {

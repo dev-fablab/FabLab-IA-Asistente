@@ -4,3 +4,6 @@ try {
 } catch {
   // En CI las variables vienen del entorno.
 }
+
+process.env.BETTER_AUTH_SECRET ??= 'integration-test-secret-with-32-characters';
+process.env.BETTER_AUTH_URL ??= 'http://localhost:3000';

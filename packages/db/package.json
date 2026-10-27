@@ -12,7 +12,6 @@
     "generate": "drizzle-kit generate",
     "generate:custom": "drizzle-kit generate --custom",
     "migrate": "drizzle-kit migrate",
-    "seed-admin": "tsx --env-file-if-exists=../../apps/web/.env.local scripts/seed-admin.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests"
   },
@@ -21,6 +20,7 @@
     "@supabase/supabase-js": "2.118.0",
     "date-fns": "^4.4.0",
     "drizzle-orm": "0.45.4",
+    "kysely": "0.29.7",
     "postgres": "3.4.9",
     "zod": "4.6.7"
   },

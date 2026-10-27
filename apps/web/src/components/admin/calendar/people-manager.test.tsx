@@ -11,9 +11,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/admin/calendar/people',
   useSearchParams: () => new URLSearchParams(nav.search),
 }));
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({ auth: { getSession: async () => ({ data: { session: { access_token: 'jwt' } } }) } }),
-}));
+
 
 const CAMILA = '00000000-0000-4000-8000-000000000001';
 const LUIS = '00000000-0000-4000-8000-000000000002';

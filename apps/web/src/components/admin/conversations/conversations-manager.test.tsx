@@ -12,9 +12,7 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(nav.search),
 }));
 // El cliente tipado pide el JWT de la sesión de Supabase antes de cada llamada.
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({ auth: { getSession: async () => ({ data: { session: { access_token: 'jwt-de-prueba' } } }) } }),
-}));
+
 
 const row = (n: number, overrides: object = {}) => ({
   id: `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`,
@@ -59,13 +57,14 @@ describe('ConversationsManager: lista', () => {
     }
   });
 
-  it('pide la primera página y envía el JWT de la sesión', async () => {
+  it('pide la primera página con la cookie de la sesión', async () => {
     render(<ConversationsManager />);
     await screen.findByRole('link', { name: 'Pregunta número 1' });
 
     expect(lastQuery()).toEqual({ page: '1' });
     const [, init] = api.fetchMock.mock.calls[0]!;
-    expect(new Headers(init?.headers).get('authorization')).toBe('Bearer jwt-de-prueba');
+    expect(init?.credentials).toBe('include');
+    expect(new Headers(init?.headers).get('authorization')).toBeNull();
   });
 
   it('muestra la paginación y avanza conservando los filtros', async () => {

@@ -4,9 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { json, mockApi } from '@/test/fetch-mock';
 import { ConversationDetailView } from './conversation-detail';
 
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({ auth: { getSession: async () => ({ data: { session: { access_token: 'jwt' } } }) } }),
-}));
+
 
 const ID = '00000000-0000-4000-8000-000000000042';
 

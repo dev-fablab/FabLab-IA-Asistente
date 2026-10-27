@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createClient } from '@/lib/supabase/client';
+import { authClient } from '@/lib/auth-client';
 
 export function LoginForm() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export function LoginForm() {
     setPending(true);
     setError(null);
 
-    const { error: signInError } = await createClient().auth.signInWithPassword({
+    const { error: signInError } = await authClient.signIn.email({
       email: String(form.get('email') ?? '').trim(),
       password: String(form.get('password') ?? ''),
     });

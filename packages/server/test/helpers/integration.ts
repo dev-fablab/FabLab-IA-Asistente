@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { EMBEDDING_DIMENSIONS, getDb, profiles } from '@fablab/db';
+import { EMBEDDING_DIMENSIONS, getDb, users } from '@fablab/db';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { eq } from 'drizzle-orm';
+import { getAuth } from '../../src/auth/instance';
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -24,34 +25,37 @@ export function anonClient(): SupabaseClient {
 export type TestUser = {
   id: string;
   email: string;
-  /** JWT real emitido por Supabase Auth. */
-  token: string;
+  /** Cookie de sesión de Better Auth (`nombre=valor`). */
+  cookie: string;
   remove: () => Promise<void>;
 };
 
-/** Crea un usuario real como lo haría un administrador (el trigger genera su perfil `staff`). */
-export async function createTestUser(role: 'staff' | 'admin' = 'staff'): Promise<TestUser> {
-  const email = `it-${role}-${randomUUID().slice(0, 8)}@fablab.test`;
-  const password = `integration-${randomUUID()}`;
+function sessionCookie(response: Response): string {
+  const parts = response.headers.getSetCookie().map((value) => value.split(';')[0]?.trim()).filter(Boolean);
+  if (parts.length === 0) throw new Error('El inicio de sesión no entregó cookie');
+  return parts.join('; ');
+}
 
-  const admin = serviceClient();
-  const { data: created, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
-  if (error || !created.user) throw new Error(`No se pudo crear el usuario de prueba: ${error?.message}`);
+/** Crea un usuario real como lo haría un administrador y abre su sesión. */
+export async function createTestUser(role: 'staff' | 'admin' = 'staff'): Promise<TestUser> {
+  const email = `it-${role}-${randomUUID().slice(0, 8)}@inacapmail.cl`;
+  const password = `integration-${randomUUID()}`;
+  const auth = getAuth();
+
+  const created = await auth.api.createUser({
+    body: { email, password, name: email.split('@')[0] ?? 'staff', role },
+  });
   const id = created.user.id;
 
-  if (role === 'admin') {
-    await getDb().update(profiles).set({ role: 'admin' }).where(eq(profiles.id, id));
-  }
-
-  const { data: session, error: signInError } = await anonClient().auth.signInWithPassword({ email, password });
-  if (signInError || !session.session) throw new Error(`No se pudo iniciar sesión: ${signInError?.message}`);
+  const signIn = await auth.api.signInEmail({ body: { email, password }, asResponse: true });
+  if (!signIn.ok) throw new Error(`No se pudo iniciar sesión de prueba (${signIn.status})`);
 
   return {
     id,
     email,
-    token: session.session.access_token,
+    cookie: sessionCookie(signIn),
     remove: async () => {
-      await admin.auth.admin.deleteUser(id);
+      await getDb().delete(users).where(eq(users.id, id));
     },
   };
 }

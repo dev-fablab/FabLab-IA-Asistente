@@ -10,12 +10,12 @@ vi.mock('next/navigation', () => ({
   usePathname: () => nav.pathname,
   useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
 }));
-vi.mock('@/lib/supabase/client', () => ({ createClient: () => ({ auth: { signOut: async () => undefined } }) }));
+vi.mock('@/lib/auth-client', () => ({ authClient: { signOut: async () => undefined } }));
 
-const renderSidebar = () =>
+const renderSidebar = (role: 'admin' | 'staff' = 'staff') =>
   render(
     <SidebarProvider>
-      <AdminSidebar email="ana@fablab.cl" />
+      <AdminSidebar email="ana@fablab.cl" role={role} />
     </SidebarProvider>,
   );
 

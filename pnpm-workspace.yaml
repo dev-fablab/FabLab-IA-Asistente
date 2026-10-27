@@ -10,6 +10,16 @@ allowBuilds:
   unrs-resolver: true
   protobufjs: false
 
+# drizzle-orm declara kysely como peer opcional. better-auth lo instala y
+# pnpm acaba con dos copias de drizzle-orm (una con kysely y otra sin él).
+# TypeScript trata esas copias como clases SQL distintas. El peer deja de
+# ser opcional para que db, agent y server resuelvan la misma copia.
+packageExtensions:
+  drizzle-orm:
+    peerDependenciesMeta:
+      kysely:
+        optional: false
+
 minimumReleaseAgeExclude:
   - '@ai-sdk/gateway@4.0.116'
   - '@ai-sdk/openai@4.0.96'

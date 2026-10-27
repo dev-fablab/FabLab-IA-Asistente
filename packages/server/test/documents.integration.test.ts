@@ -45,10 +45,10 @@ type DocumentJson = {
   stuck: boolean;
 };
 
-const call = async (method: string, path: string, body?: unknown, token = staff.token) =>
+const call = async (method: string, path: string, body?: unknown, cookie = staff.cookie) =>
   app.request(`/api/admin${path}`, {
     method,
-    headers: { authorization: `Bearer ${token}`, ...(body ? { 'content-type': 'application/json' } : {}) },
+    headers: { cookie, ...(body ? { 'content-type': 'application/json' } : {}) },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 
@@ -416,7 +416,7 @@ describe('seguridad: la clave pública no accede a nada', () => {
     const ghost = await createTestUser('staff');
     try {
       await getDb().execute(`delete from public.profiles where id = '${ghost.id}'`);
-      const res = await call('GET', '/documents', undefined, ghost.token);
+      const res = await call('GET', '/documents', undefined, ghost.cookie);
       expect(res.status).toBe(403);
     } finally {
       await ghost.remove();

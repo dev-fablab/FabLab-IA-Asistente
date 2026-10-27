@@ -21,7 +21,7 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { BrandMark } from '@/components/brand-mark';
-import { createClient } from '@/lib/supabase/client';
+import { authClient } from '@/lib/auth-client';
 import { adminNavItems, isWithin, type AdminNavItem } from './nav-items';
 
 /**
@@ -67,12 +67,13 @@ function NavGroup({ item, pathname }: { item: AdminNavItem & { children: NonNull
   );
 }
 
-export function AdminSidebar({ email }: { email?: string }) {
+export function AdminSidebar({ email, role }: { email?: string; role?: 'admin' | 'staff' }) {
   const pathname = usePathname();
   const router = useRouter();
+  const items = adminNavItems.filter((item) => !item.adminOnly || role === 'admin');
 
   async function signOut() {
-    await createClient().auth.signOut();
+    await authClient.signOut();
     router.replace('/login');
     router.refresh();
   }
@@ -94,7 +95,7 @@ export function AdminSidebar({ email }: { email?: string }) {
           <SidebarGroupLabel>Gestión</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {adminNavItems.map((item) =>
+              {items.map((item) =>
                 item.children ? (
                   <NavGroup key={item.href} item={{ ...item, children: item.children }} pathname={pathname} />
                 ) : (

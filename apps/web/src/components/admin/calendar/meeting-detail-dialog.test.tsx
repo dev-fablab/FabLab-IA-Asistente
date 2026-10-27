@@ -1,14 +1,15 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { dateKey, zonedInstant } from '@/lib/calendar';
 import { json, mockApi } from '@/test/fetch-mock';
 import { MeetingDetailDialog } from './meeting-detail-dialog';
 
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({ auth: { getSession: async () => ({ data: { session: { access_token: 'jwt' } } }) } }),
-}));
-
 const ID = '00000000-0000-4000-8000-000000000042';
+/** Dentro del mínimo del formulario (`hoy`). Una fecha fija de octubre ya quedó en el pasado. */
+const MEETING_DAY = dateKey(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+const MEETING_START = zonedInstant(MEETING_DAY, '11:00').toISOString();
+const MEETING_END = zonedInstant(MEETING_DAY, '12:00').toISOString();
 const CONVERSATION_ID = '00000000-0000-4000-8000-000000000099';
 
 const TEAM = [
@@ -20,8 +21,8 @@ const ME = 'p-ana';
 const detail = (overrides: Record<string, unknown> = {}, responsible: unknown = null) => ({
   meeting: {
     id: ID,
-    startsAt: '2026-10-26T14:00:00.000Z', // 11:00 en Santiago (UTC-3)
-    endsAt: '2026-10-26T15:00:00.000Z',
+    startsAt: MEETING_START, // 11:00 en Santiago
+    endsAt: MEETING_END,
     status: 'scheduled',
     reason: 'Quiero construir un robot',
     conversationSummary: 'Camila quiere construir un robot para su ramo y necesita la cortadora láser.',
@@ -267,7 +268,7 @@ describe('MeetingDetailDialog', () => {
     it('propone la fecha y hora actuales en la hora de Fab Lab', async () => {
       open();
       const section = await screen.findByRole('region', { name: 'Reagendar' });
-      expect(within(section).getByLabelText('Fecha')).toHaveValue('2026-10-26');
+      expect(within(section).getByLabelText('Fecha')).toHaveValue(MEETING_DAY);
       expect(within(section).getByLabelText('Hora de inicio')).toHaveValue('11:00');
     });
 

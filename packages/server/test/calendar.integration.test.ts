@@ -64,7 +64,7 @@ const jsonOf = async (res: Response): Promise<Json> => (await res.json()) as Jso
 const admin = (method: string, path: string, body?: unknown) =>
   app.request(`/api/admin/calendar${path}`, {
     method,
-    headers: { authorization: `Bearer ${staff.token}`, ...(body !== undefined && { 'content-type': 'application/json' }) },
+    headers: { cookie: staff.cookie, ...(body !== undefined && { 'content-type': 'application/json' }) },
     ...(body !== undefined && { body: JSON.stringify(body) }),
   });
 
@@ -599,7 +599,7 @@ describe('responsable de la reunión', () => {
     await admin('PATCH', `/meetings/${id}`, { responsibleId: staff.id });
     const res = await app.request(`/api/admin/calendar/meetings/${id}`, {
       method: 'PATCH',
-      headers: { authorization: `Bearer ${boss.token}`, 'content-type': 'application/json' },
+      headers: { cookie: boss.cookie, 'content-type': 'application/json' },
       body: JSON.stringify({ responsibleId: boss.id }),
     });
     expect(res.status).toBe(200);
@@ -623,7 +623,7 @@ describe('responsable de la reunión', () => {
   });
 
   it('GET /admin/team lista a todo el equipo con su rol', async () => {
-    const { members } = await jsonOf(await app.request('/api/admin/team', { headers: { authorization: `Bearer ${staff.token}` } }));
+    const { members } = await jsonOf(await app.request('/api/admin/team', { headers: { cookie: staff.cookie } }));
     expect(members.find((m: { id: string }) => m.id === staff.id)).toMatchObject({ role: 'staff', email: staff.email });
     expect(members.find((m: { id: string }) => m.id === boss.id)).toMatchObject({ role: 'admin' });
   });
@@ -857,10 +857,10 @@ describe('personas', () => {
 
 describe('personas: registro por el equipo', () => {
   const find = async (query: string) => jsonOf(await admin('GET', `/people?${query}`));
-  const create = (body: object, token = staff.token) =>
+  const create = (body: object, cookie = staff.cookie) =>
     app.request('/api/admin/calendar/people', {
       method: 'POST',
-      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      headers: { cookie, 'content-type': 'application/json' },
       body: JSON.stringify(body),
     });
   const base = (who: string, extra: object = {}) => ({ name: `Persona ${who}`, email: email(who), source: 'in_person', ...extra });
@@ -875,7 +875,7 @@ describe('personas: registro por el equipo', () => {
   });
 
   it('un admin también puede registrar personas', async () => {
-    const res = await create(base('crea-admin', { source: 'phone' }), boss.token);
+    const res = await create(base('crea-admin', { source: 'phone' }), boss.cookie);
     expect(res.status).toBe(201);
     expect((await jsonOf(res)).person).toMatchObject({ source: 'phone', createdById: boss.id });
   });
@@ -1007,7 +1007,7 @@ describe('personas: registro por el equipo', () => {
 
   it('borrar al miembro del equipo que la registró no borra a la persona', async () => {
     const author = await createTestUser('staff');
-    const res = await create(base('autor-sale'), author.token);
+    const res = await create(base('autor-sale'), author.cookie);
     const { person } = await jsonOf(res);
     await author.remove();
     expect((await jsonOf(await admin('GET', `/people/${person.id}`))).person).toMatchObject({ createdById: null, createdByName: null });
