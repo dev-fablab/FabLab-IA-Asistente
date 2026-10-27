@@ -78,6 +78,13 @@
       "when": 1792716798571,
       "tag": "0010_melodic_wolverine",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793130188676,
+      "tag": "0011_crazy_thanos",
+      "breakpoints": true
     }
   ]
 }

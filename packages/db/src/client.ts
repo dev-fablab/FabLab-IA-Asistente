@@ -1,12 +1,12 @@
 import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import postgres, { type Sql } from 'postgres';
 import * as schema from './schema';
 
 export type Database = PostgresJsDatabase<typeof schema>;
 
 // En desarrollo Next recarga los módulos: se guarda el cliente en globalThis
 // para no abrir un pool nuevo en cada recarga.
-const globalForDb = globalThis as typeof globalThis & { __fablabDb?: Database };
+const globalForDb = globalThis as typeof globalThis & { __fablabDb?: Database; __fablabSql?: Sql };
 
 /**
  * Cliente de Drizzle sobre una conexión directa de Postgres. Esta conexión omite RLS:
@@ -26,6 +26,15 @@ export function getDb(): Database {
     prepare: false,
     max: Number(process.env.DATABASE_POOL_MAX ?? 5),
   });
+  globalForDb.__fablabSql = client;
   globalForDb.__fablabDb = drizzle(client, { schema });
   return globalForDb.__fablabDb;
+}
+
+/** Cierra el pool. Lo usan los scripts que deben terminar al acabar. */
+export async function closeDb(): Promise<void> {
+  const client = globalForDb.__fablabSql;
+  globalForDb.__fablabDb = undefined;
+  globalForDb.__fablabSql = undefined;
+  if (client) await client.end({ timeout: 5 });
 }

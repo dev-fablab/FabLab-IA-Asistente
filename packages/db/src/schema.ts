@@ -15,7 +15,6 @@ import {
   uuid,
   vector,
 } from 'drizzle-orm/pg-core';
-import { authUsers } from 'drizzle-orm/supabase';
 
 /**
  * Dimensión de los embeddings; debe coincidir con EMBEDDING_DIMENSION y con el modelo elegido
@@ -32,13 +31,85 @@ export const PROFILE_ROLES = ['admin', 'staff'] as const;
 export type ProfileRole = (typeof PROFILE_ROLES)[number];
 
 const createdAt = () => timestamp('created_at', { withTimezone: true }).notNull().defaultNow();
+const authTimestamp = (column: string) => timestamp(column, { withTimezone: true }).notNull().defaultNow();
+
+/**
+ * Tablas de Better Auth. Los nombres en plural coinciden con `usePlural` del adaptador.
+ * La contraseña vive hasheada en `accounts.password` (proveedor `credential`).
+ */
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('email_verified').notNull().default(false),
+  image: text('image'),
+  createdAt: authTimestamp('created_at'),
+  updatedAt: authTimestamp('updated_at').$onUpdate(() => new Date()),
+  role: text('role').default('staff'),
+  banned: boolean('banned').default(false),
+  banReason: text('ban_reason'),
+  banExpires: timestamp('ban_expires', { withTimezone: true }),
+});
+
+export const sessions = pgTable(
+  'sessions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    token: text('token').notNull().unique(),
+    createdAt: authTimestamp('created_at'),
+    updatedAt: authTimestamp('updated_at').$onUpdate(() => new Date()),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    impersonatedBy: text('impersonated_by'),
+  },
+  (t) => [index('sessions_user_idx').on(t.userId)],
+);
+
+export const accounts = pgTable(
+  'accounts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: text('account_id').notNull(),
+    providerId: text('provider_id').notNull(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    accessToken: text('access_token'),
+    refreshToken: text('refresh_token'),
+    idToken: text('id_token'),
+    accessTokenExpiresAt: timestamp('access_token_expires_at', { withTimezone: true }),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at', { withTimezone: true }),
+    scope: text('scope'),
+    password: text('password'),
+    createdAt: authTimestamp('created_at'),
+    updatedAt: authTimestamp('updated_at').$onUpdate(() => new Date()),
+  },
+  (t) => [index('accounts_user_idx').on(t.userId), uniqueIndex('accounts_provider_account_uidx').on(t.providerId, t.accountId)],
+);
+
+export const verifications = pgTable(
+  'verifications',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    identifier: text('identifier').notNull(),
+    value: text('value').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: authTimestamp('created_at'),
+    updatedAt: authTimestamp('updated_at').$onUpdate(() => new Date()),
+  },
+  (t) => [index('verifications_identifier_idx').on(t.identifier)],
+);
 
 export const profiles = pgTable(
   'profiles',
   {
     id: uuid('id')
       .primaryKey()
-      .references(() => authUsers.id, { onDelete: 'cascade' }),
+      .references(() => users.id, { onDelete: 'cascade' }),
     email: text('email').notNull(),
     fullName: text('full_name'),
     role: text('role', { enum: PROFILE_ROLES }).notNull().default('staff'),

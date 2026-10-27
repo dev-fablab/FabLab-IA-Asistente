@@ -1,4 +1,4 @@
 export * from './schema';
-export { getDb, type Database } from './client';
+export { closeDb, getDb, type Database } from './client';
 export { listActiveContactChannels } from './queries';
 export * from './calendar';
