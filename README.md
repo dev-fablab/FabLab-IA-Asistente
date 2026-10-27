@@ -10,7 +10,7 @@ Next.js 16 (web y panel) · Hono (API, montada en `app/api`) · Mastra (agente, 
 
 ```text
 apps/web          Next.js: chat público (/), login (/login) y panel (/admin/*). Monta la API.
-packages/server   App Hono: rutas, middleware (JWT, límite de tasa), ingesta e historial. Sin Next.js.
+packages/server   App Hono: rutas, middleware (sesión, límite de tasa), ingesta e historial. Sin Next.js.
 packages/agent    Agente de Mastra, herramientas, instrucciones y modelos. Sin Next.js ni Hono.
 packages/db       Esquema de Drizzle, migraciones y acceso a Storage.
 tests/eval        Evaluación del agente contra un conjunto de preguntas.
@@ -32,11 +32,11 @@ Completa `apps/web/.env.local`. Con Supabase local, `pnpm supabase status` muest
 ```bash
 pnpm db:migrate                                              # aplica las migraciones de Drizzle
 pnpm models:check                                            # verifica las claves y los modelos (opcional, recomendado)
-pnpm db:seed-admin --email tu@correo.cl --password "<mínimo 12 caracteres>"   # primer administrador
+pnpm db:seed-admin                                           # admin@inacapmail.cl y staff@inacapmail.cl
 pnpm dev                                                     # http://localhost:3000
 ```
 
-El registro público de Supabase Auth está desactivado: los usuarios del panel los crea un administrador (el script anterior, o el panel de Supabase). El trigger de la base les asigna el rol `staff`; los cambios de rol se hacen con SQL.
+El registro público está cerrado. En local, `pnpm db:seed-admin` crea las dos cuentas con `SEED_ADMIN_PASSWORD` y `SEED_STAFF_PASSWORD` (mínimo 12 caracteres). En producción y staging se crean al arrancar si faltan. Los demás accesos los vincula un administrador en el panel.
 
 ## Scripts
 
